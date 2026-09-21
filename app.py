@@ -56,9 +56,29 @@ def short_school(name):
             return name[:-len(old)] + new
     return name
 
+PALETTE = [
+    ("#7FA7D8", "rgba(127,167,216,0.14)"),
+    ("#87B49B", "rgba(135,180,155,0.14)"),
+    ("#A996C8", "rgba(169,150,200,0.14)"),
+    ("#D1A477", "rgba(209,164,119,0.14)"),
+    ("#78AEB0", "rgba(120,174,176,0.14)"),
+    ("#C58F9C", "rgba(197,143,156,0.14)"),
+    ("#9EAD7B", "rgba(158,173,123,0.14)"),
+    ("#9A9FC5", "rgba(154,159,197,0.14)"),
+]
+
+def person_color(name):
+    key = name or "미지정"
+    idx = sum((i + 1) * ord(ch) for i, ch in enumerate(key)) % len(PALETTE)
+    return PALETTE[idx]
+
+def event_color(event):
+    people = event.get("people", [])
+    return person_color(people[0] if people else "미지정")
+
 def month_label(event):
-    school=short_school(event["school"])
-    surnames="·".join(p[0] for p in event["people"] if p)
+    school = short_school(event["school"])
+    surnames = "·".join(p[0] for p in event["people"] if p)
     return f"{school}({surnames})" if surnames else school
 
 st.markdown("""
