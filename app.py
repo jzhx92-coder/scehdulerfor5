@@ -90,7 +90,7 @@ h1{font-size:2.35rem!important;letter-spacing:-.09rem!important;margin:.2rem 0 0
 .sub{color:#768196;font-size:1rem;margin:.2rem 0 1.2rem}
 .brand{color:#607087;font-size:.82rem;font-weight:750;display:flex;align-items:center;gap:.45rem}
 .brand:before{content:"";width:.48rem;height:.48rem;border-radius:50%;background:#30c778;box-shadow:0 0 0 4px #30c77818}
-.today{position:relative;overflow:hidden;background:linear-gradient(145deg,#2688ff,#075fd8);color:white;border-radius:1.75rem;padding:1.4rem;box-shadow:0 18px 42px #006be32b;margin:.9rem 0 1rem}
+.today{position:relative;overflow:hidden;background:linear-gradient(145deg,#273447,#202b3b);color:#eef2f7;border-radius:1.75rem;padding:1.4rem;box-shadow:0 14px 34px #00000022;margin:.9rem 0 1rem}
 .today.empty{background:linear-gradient(145deg,#fff,#fbfcff);color:#182230;border:1px solid white;box-shadow:0 12px 34px #263e6610}
 .kicker{font-size:.88rem;font-weight:750;opacity:.8;margin-bottom:.65rem}.school{font-size:1.4rem;font-weight:850;letter-spacing:-.03rem}.people{font-size:.93rem;opacity:.88;margin-top:.35rem}
 div[data-baseweb="select"]>div{border:0!important;border-radius:1rem!important;background:#ffffffdd!important;box-shadow:0 7px 22px #30486f0d!important}
@@ -144,7 +144,7 @@ with right:
 shown_events=[e for e in all_events if e["date"]==shown_day]
 if shown_events:
     inner='<div class="kicker">'+fmt_day(shown_day)+'</div>'+"".join(
-        f'<div class="school">{e["school"]}</div><div class="people">{person_text(e["people"])}</div>' for e in shown_events)
+        f'<div class="school">{e["school"]} <span style="font-weight:650">({person_text(e["people"])})</span></div>' for e in shown_events)
     st.markdown(f'<section class="today">{inner}</section>',unsafe_allow_html=True)
 else:
     msg="예정된 3차 점검이 없습니다"
