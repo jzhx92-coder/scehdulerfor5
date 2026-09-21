@@ -117,7 +117,7 @@ div[data-testid="stButton"] button[kind="tertiary"]:hover{background:#7f8da512!i
 
 today=date.today()
 if "today_cursor" not in st.session_state: st.session_state.today_cursor=today
-if "month_cursor" not in st.session_state:\n    st.session_state.month_cursor = today\nif "week_cursor" not in st.session_state:\n    st.session_state.week_cursor = today
+st.session_state.setdefault("month_cursor", today); st.session_state.setdefault("week_cursor", today)
 
 st.markdown('<div class="brand">자율형종합감사 일정</div>',unsafe_allow_html=True)
 st.title(f"{today.month}월 {today.day}일")
