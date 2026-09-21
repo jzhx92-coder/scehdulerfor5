@@ -75,14 +75,14 @@ h1{font-size:2.35rem!important;letter-spacing:-.09rem!important;margin:.2rem 0 0
 .kicker{font-size:.88rem;font-weight:750;opacity:.8;margin-bottom:.65rem}.school{font-size:1.4rem;font-weight:850;letter-spacing:-.03rem}.people{font-size:.93rem;opacity:.88;margin-top:.35rem}
 div[data-baseweb="select"]>div{border:0!important;border-radius:1rem!important;background:#ffffffdd!important;box-shadow:0 7px 22px #30486f0d!important}
 .panel{background:#ffffffea;border:1px solid white;border-radius:1.65rem;padding:1.15rem;box-shadow:0 14px 42px #2038560d;margin-top:.7rem}
-.event{position:relative;background:#f3f6fa;border:1px solid #edf0f5;border-radius:1.1rem;padding:.85rem 1rem .85rem 1.15rem;margin:.5rem 0}.event:before{content:"";position:absolute;left:0;top:.8rem;bottom:.8rem;width:4px;border-radius:0 4px 4px 0;background:#1677ff}.event-date{font-size:.78rem;color:#7f8a9a;font-weight:650}.event-school{font-size:1.03rem;font-weight:820;margin-top:.18rem}.event-person{font-size:.87rem;color:#657084;margin-top:.2rem}.none{text-align:center;color:#8a95a6;padding:2rem .5rem}
+.event{position:relative;background:#f3f6fa;border:1px solid #edf0f5;border-radius:1.1rem;padding:.85rem 1rem .85rem 1.15rem;margin:.5rem 0}.event-date{font-size:.78rem;color:#7f8a9a;font-weight:650}.event-school{font-size:1.03rem;font-weight:820;margin-top:.18rem}.event-person{font-size:.87rem;color:#657084;margin-top:.2rem}.none{text-align:center;color:#8a95a6;padding:2rem .5rem}
 .stButton button{border-radius:1rem;border:0;font-weight:750}
 .navtitle{text-align:center;font-weight:850;font-size:1.05rem}
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
 .dow{text-align:center;color:#8b96a8;font-size:.72rem;font-weight:750;padding:.2rem 0 .35rem}
 .cell{min-height:64px;border-radius:.7rem;padding:.3rem;background:#f6f8fb;border:1px solid #edf0f5;min-width:0;overflow:hidden}
 .cell.blank{background:transparent;border-color:transparent}.num{font-size:.76rem;font-weight:750}.dot{width:5px;height:5px;border-radius:50%;background:#1677ff;margin-top:4px}
-.cal-school{font-size:.56rem;line-height:1.15;margin-top:3px;font-weight:750;white-space:nowrap;letter-spacing:-.03em;overflow:hidden;text-overflow:clip}
+.cal-school{font-size:.56rem;line-height:1.2;margin-top:3px;font-weight:750;white-space:nowrap;letter-spacing:-.03em;overflow:hidden;text-overflow:clip;border-radius:.32rem;padding:2px 3px}
 @media (prefers-color-scheme:dark){
  .stApp{background:radial-gradient(circle at 50% -10%,#101827 0,#0e1117 38%);color:#e5e9f2}
  .today.empty,.panel{background:#15181e;color:#e5e9f2;border-color:#30343b;box-shadow:none}
@@ -139,7 +139,7 @@ def cards(items):
     if not items:
         st.markdown('<div class="panel"><div class="none">예정된 3차 점검이 없습니다.</div></div>',unsafe_allow_html=True); return
     html='<div class="panel">'+"".join(
-        f'<div class="event"><div class="event-date">{fmt_day(e["date"])}</div><div class="event-school">{e["school"]}</div><div class="event-person">{person_text(e["people"])}</div></div>' for e in items)+'</div>'
+        f'<div class="event" style="border-left:4px solid {event_color(e)[0]};background:linear-gradient(90deg,{event_color(e)[1]},transparent 42%)"><div class="event-date">{fmt_day(e["date"])}</div><div class="event-school">{e["school"]}</div><div class="event-person" style="color:{event_color(e)[0]}">{person_text(e["people"])}</div></div>' for e in items)+'</div>'
     st.markdown(html,unsafe_allow_html=True)
 
 if st.session_state.view=="주간":
@@ -167,7 +167,7 @@ else:
             if not d: html+='<div class="cell blank"></div>'
             else:
                 es=by_day.get(d,[])
-                labels="".join(f'<div class="cal-school">{month_label(e)}</div>' for e in es[:3])
+                labels="".join(f'<div class="cal-school" style="color:{event_color(e)[0]};background:{event_color(e)[1]}">{month_label(e)}</div>' for e in es[:3])
                 dot='<div class="dot"></div>' if es else ''
                 html+=f'<div class="cell"><div class="num">{d}</div>{dot}{labels}</div>'
     html+='</div></div>'
