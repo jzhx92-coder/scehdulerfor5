@@ -97,10 +97,9 @@ div[data-baseweb="select"]>div{border:0!important;border-radius:1rem!important;b
 .panel{background:#ffffffea;border:1px solid white;border-radius:1.65rem;padding:1.15rem;box-shadow:0 14px 42px #2038560d;margin-top:.7rem}
 .event{position:relative;background:#f3f6fa;border:1px solid #edf0f5;border-radius:1.1rem;padding:.85rem 1rem .85rem 1.15rem;margin:.5rem 0}.event-date{font-size:.78rem;color:#7f8a9a;font-weight:650}.event-school{font-size:1.03rem;font-weight:820;margin-top:.18rem}.event-person{font-size:.87rem;color:#657084;margin-top:.2rem}.none{text-align:center;color:#8a95a6;padding:2rem .5rem}
 .stButton button{border-radius:1rem;border:0;font-weight:750}
-.today-nav{display:flex;align-items:center;justify-content:center;gap:.75rem;margin:.15rem 0 0}
-div[role="radiogroup"][aria-label="날짜 이동"]{display:flex;justify-content:center;gap:.25rem;margin-top:-2.15rem;margin-bottom:.35rem;opacity:0}
-div[role="radiogroup"][aria-label="날짜 이동"] label{width:3rem;height:2rem}
 .today-nav-title{text-align:center;font-weight:800;color:#768196;font-size:1rem;line-height:2rem}
+div[data-testid="stButton"] button[kind="tertiary"]{min-height:2rem!important;height:2rem!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;border-radius:999px!important;font-size:1.25rem!important;color:#8a95a6!important}
+div[data-testid="stButton"] button[kind="tertiary"]:hover{background:#7f8da512!important}
 .navtitle{text-align:center;font-weight:850;font-size:1.05rem}
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
 .dow{text-align:center;color:#8b96a8;font-size:.72rem;font-weight:750;padding:.2rem 0 .35rem}
@@ -118,7 +117,7 @@ div[role="radiogroup"][aria-label="날짜 이동"] label{width:3rem;height:2rem}
 
 today=date.today()
 if "today_cursor" not in st.session_state: st.session_state.today_cursor=today
-if "month_cursor" not in st.session_state: st.session_state.month_cursor=today
+if "month_cursor" not in st.session_state: st.session_state.month_cursor=today\nif "week_cursor" not in st.session_state: st.session_state.week_cursor=today
 
 st.markdown('<div class="brand">자율형종합감사 일정</div>',unsafe_allow_html=True)
 st.title(f"{today.month}월 {today.day}일")
@@ -132,14 +131,15 @@ except Exception as exc:
 # 오늘의 일정 카드 자체가 일간 탐색기 역할을 함
 shown_day=st.session_state.today_cursor
 label="오늘의 일정" if shown_day==today else f"{shown_day.month}월 {shown_day.day}일 일정"
-
-# 모바일에서도 세 요소가 절대 세로로 쌓이지 않도록 한 줄짜리 네비게이션 사용
-st.markdown(f'<div class="today-nav"><span>‹</span><span class="today-nav-title">{label}</span><span>›</span></div>',unsafe_allow_html=True)
-nav_choice=st.radio("날짜 이동",["이전","현재","다음"],index=1,horizontal=True,label_visibility="collapsed",key="today_nav_action")
-if nav_choice!="현재":
-    st.session_state.today_cursor += timedelta(days=-1 if nav_choice=="이전" else 1)
-    st.session_state.today_nav_action="현재"
-    st.rerun()
+left,center,right=st.columns([1,5,1],vertical_alignment="center",gap="small")
+with left:
+    if st.button("‹",key="today_prev",type="tertiary",use_container_width=True):
+        st.session_state.today_cursor-=timedelta(days=1); st.rerun()
+with center:
+    st.markdown(f'<div class="today-nav-title">{label}</div>',unsafe_allow_html=True)
+with right:
+    if st.button("›",key="today_next",type="tertiary",use_container_width=True):
+        st.session_state.today_cursor+=timedelta(days=1); st.rerun()
 
 shown_events=[e for e in all_events if e["date"]==shown_day]
 if shown_events:
@@ -166,19 +166,27 @@ def cards(items):
     st.markdown(html,unsafe_allow_html=True)
 
 if st.session_state.view=="주간":
-    cursor=st.session_state.today_cursor
+    cursor=st.session_state.week_cursor
     start=cursor-timedelta(days=cursor.weekday()); end=start+timedelta(days=6)
-    st.markdown(f'<div class="navtitle">{start.month}월 {start.day}일 – {end.month}월 {end.day}일</div>',unsafe_allow_html=True)
+    left,mid,right=st.columns([1,5,1],vertical_alignment="center",gap="small")
+    with left:
+        if st.button("‹",key="week_prev",type="tertiary",use_container_width=True):
+            st.session_state.week_cursor-=timedelta(days=7); st.rerun()
+    with mid:
+        st.markdown(f'<div class="navtitle">{start.month}월 {start.day}일 – {end.month}월 {end.day}일</div>',unsafe_allow_html=True)
+    with right:
+        if st.button("›",key="week_next",type="tertiary",use_container_width=True):
+            st.session_state.week_cursor+=timedelta(days=7); st.rerun()
     cards([e for e in events if start<=e["date"]<=end])
 else:
     cursor=st.session_state.month_cursor; y,m=cursor.year,cursor.month
-    left,mid,right=st.columns([1,7,1],vertical_alignment="center")
+    left,mid,right=st.columns([1,5,1],vertical_alignment="center",gap="small")
     with left:
-        if st.button("‹",key="month_prev",use_container_width=True):
+        if st.button("‹",key="month_prev",type="tertiary",use_container_width=True):
             st.session_state.month_cursor=date(y-1,12,1) if m==1 else date(y,m-1,1); st.rerun()
     with mid: st.markdown(f'<div class="navtitle">{y}년 {m}월</div>',unsafe_allow_html=True)
     with right:
-        if st.button("›",key="month_next",use_container_width=True):
+        if st.button("›",key="month_next",type="tertiary",use_container_width=True):
             st.session_state.month_cursor=date(y+1,1,1) if m==12 else date(y,m+1,1); st.rerun()
     month_events=[e for e in events if (e["date"].year,e["date"].month)==(y,m)]
     by_day={}
