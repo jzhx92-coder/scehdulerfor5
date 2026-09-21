@@ -97,8 +97,9 @@ div[data-baseweb="select"]>div{border:0!important;border-radius:1rem!important;b
 .panel{background:#ffffffea;border:1px solid white;border-radius:1.65rem;padding:1.15rem;box-shadow:0 14px 42px #2038560d;margin-top:.7rem}
 .event{position:relative;background:#f3f6fa;border:1px solid #edf0f5;border-radius:1.1rem;padding:.85rem 1rem .85rem 1.15rem;margin:.5rem 0}.event-date{font-size:.78rem;color:#7f8a9a;font-weight:650}.event-school{font-size:1.03rem;font-weight:820;margin-top:.18rem}.event-person{font-size:.87rem;color:#657084;margin-top:.2rem}.none{text-align:center;color:#8a95a6;padding:2rem .5rem}
 .stButton button{border-radius:1rem;border:0;font-weight:750}
-div[data-testid="stHorizontalBlock"]:has(button[kind="secondary"]) {align-items:center}
-div[data-testid="stHorizontalBlock"] button[kind="secondary"]{min-height:2rem;height:2rem;padding:0 .35rem;border-radius:999px;background:transparent!important;border:0!important;box-shadow:none!important;font-size:1.15rem}
+.today-nav{display:flex;align-items:center;justify-content:center;gap:.75rem;margin:.15rem 0 0}
+div[role="radiogroup"][aria-label="날짜 이동"]{display:flex;justify-content:center;gap:.25rem;margin-top:-2.15rem;margin-bottom:.35rem;opacity:0}
+div[role="radiogroup"][aria-label="날짜 이동"] label{width:3rem;height:2rem}
 .today-nav-title{text-align:center;font-weight:800;color:#768196;font-size:1rem;line-height:2rem}
 .navtitle{text-align:center;font-weight:850;font-size:1.05rem}
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
@@ -130,16 +131,15 @@ except Exception as exc:
 
 # 오늘의 일정 카드 자체가 일간 탐색기 역할을 함
 shown_day=st.session_state.today_cursor
-left,center,right=st.columns([1,5,1],vertical_alignment="center")
-with left:
-    if st.button("‹",key="today_prev",help="이전 날짜"):
-        st.session_state.today_cursor-=timedelta(days=1); st.rerun()
-with center:
-    label="오늘의 일정" if shown_day==today else f"{shown_day.month}월 {shown_day.day}일 일정"
-    st.markdown(f'<div class="today-nav-title">{label}</div>',unsafe_allow_html=True)
-with right:
-    if st.button("›",key="today_next",help="다음 날짜"):
-        st.session_state.today_cursor+=timedelta(days=1); st.rerun()
+label="오늘의 일정" if shown_day==today else f"{shown_day.month}월 {shown_day.day}일 일정"
+
+# 모바일에서도 세 요소가 절대 세로로 쌓이지 않도록 한 줄짜리 네비게이션 사용
+st.markdown(f'<div class="today-nav"><span>‹</span><span class="today-nav-title">{label}</span><span>›</span></div>',unsafe_allow_html=True)
+nav_choice=st.radio("날짜 이동",["이전","현재","다음"],index=1,horizontal=True,label_visibility="collapsed",key="today_nav_action")
+if nav_choice!="현재":
+    st.session_state.today_cursor += timedelta(days=-1 if nav_choice=="이전" else 1)
+    st.session_state.today_nav_action="현재"
+    st.rerun()
 
 shown_events=[e for e in all_events if e["date"]==shown_day]
 if shown_events:
