@@ -7,7 +7,7 @@ const color=n=>COLORS[[...(n||"미지정")].reduce((a,ch,i)=>a+ch.charCodeAt(0)*
 const short=s=>s.replace(/여자고등학교$/,"고").replace(/여자중학교$/,"여중").replace(/초등학교$/,"초").replace(/중학교$/,"중").replace(/고등학교$/,"고").replace(/유치원$/,"유");
 const fmt=d=>`${d.getMonth()+1}월 ${d.getDate()}일`;
 export default function Home(){
- const [events,setEvents]=useState([]),[day,setDay]=useState(new Date()),[week,setWeek]=useState(new Date()),[month,setMonth]=useState(new Date()),[view,setView]=useState("week"),[who,setWho]=useState("전체 일정"),[mine,setMine]=useState(false),[loading,setLoading]=useState(true);
+ const [events,setEvents]=useState([]),[day,setDay]=useState(new Date()),[week,setWeek]=useState(new Date()),[month,setMonth]=useState(new Date()),[view,setView]=useState("month"),[who,setWho]=useState("전체 일정"),[mine,setMine]=useState(false),[loading,setLoading]=useState(true);
  const load=()=>{setLoading(true);fetch("/api/events").then(r=>r.json()).then(j=>setEvents(j.events||[])).finally(()=>setLoading(false))};
  useEffect(load,[]);
  const names=[...new Set(events.flatMap(e=>e.people))].sort();
