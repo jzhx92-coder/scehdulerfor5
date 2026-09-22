@@ -76,6 +76,16 @@ def event_color(event):
     people = event.get("people", [])
     return person_color(people[0] if people else "미지정")
 
+KOREAN_HOLIDAYS = {
+    date(2027,1,1), date(2027,2,6), date(2027,2,7), date(2027,2,8), date(2027,2,9),
+    date(2027,3,1), date(2027,3,2), date(2027,5,5), date(2027,5,13), date(2027,6,6),
+    date(2027,8,15), date(2027,8,16), date(2027,10,3), date(2027,10,4),
+    date(2027,10,9), date(2027,10,11), date(2027,12,25), date(2027,12,27),
+}
+
+def is_korean_holiday(d):
+    return d in KOREAN_HOLIDAYS
+
 def month_label(event):
     school = short_school(event["school"])
     surnames = "·".join(p[0] for p in event["people"] if p)
@@ -101,8 +111,8 @@ div[data-baseweb="select"]>div{border:0!important;border-radius:1rem!important;b
 div[data-testid="stButton"] button[kind="tertiary"]{min-height:2rem!important;height:2rem!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;border-radius:999px!important;font-size:1.25rem!important;color:#8a95a6!important}
 div[data-testid="stButton"] button[kind="tertiary"]:hover{background:#7f8da512!important}
 .navtitle{text-align:center;font-weight:850;font-size:1.05rem}
-.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
-.dow{text-align:center;color:#8b96a8;font-size:.72rem;font-weight:750;padding:.2rem 0 .35rem}
+.cal{display:grid;grid-template-columns:.72fr 1.12fr 1.12fr 1.12fr 1.12fr 1.12fr .72fr;gap:4px}
+.dow{text-align:center;color:#8b96a8;font-size:.72rem;font-weight:750;padding:.2rem 0 .35rem}.dow.weekend{color:#e05252}.num.weekend,.num.holiday{color:#e05252}
 .cell{min-height:64px;border-radius:.7rem;padding:.3rem;background:#f6f8fb;border:1px solid #edf0f5;min-width:0;overflow:hidden}
 .cell.blank{background:transparent;border-color:transparent}.num{font-size:.76rem;font-weight:750}.dot{width:5px;height:5px;border-radius:50%;background:#1677ff;margin-top:4px}
 .cal-school{font-size:.56rem;line-height:1.2;margin-top:3px;font-weight:750;white-space:nowrap;letter-spacing:-.03em;overflow:hidden;text-overflow:clip;border-radius:.32rem;padding:2px 3px}
@@ -191,8 +201,8 @@ else:
     month_events=[e for e in events if (e["date"].year,e["date"].month)==(y,m)]
     by_day={}
     for e in month_events: by_day.setdefault(e["date"].day,[]).append(e)
-    weeks=calendar.Calendar(firstweekday=0).monthdayscalendar(y,m)
-    html='<div class="panel"><div class="cal">'+"".join(f'<div class="dow">{x}</div>' for x in ["월","화","수","목","금","토","일"])
+    weeks=calendar.Calendar(firstweekday=6).monthdayscalendar(y,m)
+    html='<div class="panel"><div class="cal">'+"".join(f'<div class="dow{" weekend" if x in ["일","토"] else ""}">{x}</div>' for x in ["일","월","화","수","목","금","토"])
     for week in weeks:
         for d in week:
             if not d: html+='<div class="cell blank"></div>'
@@ -200,7 +210,11 @@ else:
                 es=by_day.get(d,[])
                 labels="".join(f'<div class="cal-school" style="color:{event_color(e)[0]};background:{event_color(e)[1]}">{month_label(e)}</div>' for e in es[:3])
                 dot='<div class="dot"></div>' if es else ''
-                html+=f'<div class="cell"><div class="num">{d}</div>{dot}{labels}</div>'
+                day_date=date(y,m,d)
+                is_weekend=day_date.weekday()>=5
+                is_holiday=is_korean_holiday(day_date)
+                num_class="num" + (" weekend" if is_weekend else "") + (" holiday" if is_holiday else "")
+                html+=f'<div class="cell"><div class="{num_class}">{d}</div>{dot}{labels}</div>'
     html+='</div></div>'
     st.markdown(html,unsafe_allow_html=True)
 
