@@ -202,7 +202,9 @@ else:
     by_day={}
     for e in month_events: by_day.setdefault(e["date"].day,[]).append(e)
     weeks=calendar.Calendar(firstweekday=6).monthdayscalendar(y,m)
-    html='<div class="panel"><div class="cal">'+"".join(f'<div class="dow{" weekend" if x in ["일","토"] else ""}">{x}</div>' for x in ["일","월","화","수","목","금","토"])
+    day_names=["일","월","화","수","목","금","토"]
+    header_html="".join('<div class="dow weekend">'+x+'</div>' if x in ["일","토"] else '<div class="dow">'+x+'</div>' for x in day_names)
+    html='<div class="panel"><div class="cal">'+header_html
     for week in weeks:
         for d in week:
             if not d: html+='<div class="cell blank"></div>'
