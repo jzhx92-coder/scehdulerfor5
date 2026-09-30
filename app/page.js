@@ -52,7 +52,7 @@ export default function Home(){
    <div className="calendar"><div className="dows">{["일","월","화","수","목","금","토"].map(x=><b className={x==="토"||x==="일"?"red":""} key={x}>{x}</b>)}</div><div className="grid">{Array.from({length:blanks}).map((_,i)=><div key={"b"+i}/>) }{Array.from({length:days},(_,i)=>i+1).map(d=>{const date=new Date(y,m,d);const es=filtered.filter(e=>e.date===key(date));return <button type="button" className="cell" key={d} aria-label={`${y}년 ${m+1}월 ${d}일 일정 ${es.length}건 보기`} onClick={()=>setSelectedDate(date)}><strong className={isRedDay(date)?"red":""}>{d}</strong>{es.map((e,i)=><span key={i} style={{color:color(e.people[0]),background:color(e.people[0])+"20"}}>{short(e.school)}({e.people.map(p=>p[0]).join("·")})</span>)}</button>})}</div></div>
   </>}
   <p className="calendarhint">월간 달력의 날짜를 누르면 일정을 크게 볼 수 있습니다.</p>
-  {selectedDate&&<DayDialog date={selectedDate} items={filtered.filter(e=>e.date===key(selectedDate))} loading={loading&&!hasData} onClose={()=>setSelectedDate(null)}/>}
+  {selectedDate&&<DayDialog date={selectedDate} items={events.filter(e=>e.date===key(selectedDate))} loading={loading&&!hasData} onClose={()=>setSelectedDate(null)}/>}
   {error&&<p className="error" role="alert">{error}{hasData?" 이전에 불러온 일정을 표시하고 있습니다.":""}</p>}
   <button className="reload" disabled={loading} onClick={()=>load(true)}>{loading?(hasData?"최신 일정 확인 중…":"불러오는 중…"):"↻ 최신 일정 불러오기"}</button>
  </main>
