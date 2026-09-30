@@ -1,4 +1,5 @@
 import {NextResponse} from "next/server";
+import {unstable_cache,revalidateTag} from "next/cache";
 export const dynamic="force-dynamic";
 
 function plain(prop){
@@ -11,11 +12,9 @@ function plain(prop){
  return typeof v==="string"?v:"";
 }
 
-export async function GET(){
- const token=process.env.NOTION_TOKEN, id=process.env.NOTION_DATA_SOURCE_ID;
- if(!token||!id)return NextResponse.json({error:"Notion 환경변수가 필요합니다."},{status:500});
- try{
-  const results=[];
+async function queryEvents(id){
+ const token=process.env.NOTION_TOKEN;
+ const results=[];
   let cursor;
   do{
    const body={page_size:100};
@@ -24,7 +23,8 @@ export async function GET(){
     method:"POST",
     headers:{Authorization:`Bearer ${token}`,"Notion-Version":"2025-09-03","Content-Type":"application/json"},
     body:JSON.stringify(body),
-    cache:"no-store"
+    cache:"no-store",
+    signal:AbortSignal.timeout(15000)
    });
    if(!r.ok)throw new Error(await r.text());
    const j=await r.json();
@@ -42,7 +42,17 @@ export async function GET(){
    };
   }).filter(x=>x.date&&x.school);
 
-  return NextResponse.json({events});
+  return events.sort((a,b)=>a.date.localeCompare(b.date)||a.school.localeCompare(b.school,"ko"));
+}
+const cachedEvents=unstable_cache(queryEvents,["audit-events-v1"],{revalidate:60,tags:["audit-events"]});
+
+export async function GET(request){
+ const token=process.env.NOTION_TOKEN, id=process.env.NOTION_DATA_SOURCE_ID;
+ if(!token||!id)return NextResponse.json({error:"Notion 환경변수가 필요합니다."},{status:500});
+ try{
+  if(new URL(request.url).searchParams.get("refresh")==="1")revalidateTag("audit-events");
+  const events=await cachedEvents(id);
+  return NextResponse.json({events},{headers:{"Cache-Control":"no-store"}});
  }catch(e){
   return NextResponse.json({error:"일정을 불러오지 못했습니다.",detail:String(e)},{status:500});
  }
