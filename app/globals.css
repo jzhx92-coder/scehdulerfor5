@@ -16,3 +16,5 @@
 .daydialog .panel article{padding:18px;line-height:1.6}
 .daydialog .panel article b{font-size:22px;overflow-wrap:anywhere}
 .daydialog .panel article span{font-size:18px;overflow-wrap:anywhere}
+.daylist{list-style:none;margin:0;padding:0}
+.daylist li{font-size:22px;font-weight:750;line-height:1.5;padding:10px 0;overflow-wrap:anywhere}

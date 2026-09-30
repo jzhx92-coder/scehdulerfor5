@@ -72,6 +72,6 @@ function DayDialog({date,items,loading,onClose}){
  return <dialog ref={ref} className="daydialog" aria-labelledby="day-title" onCancel={onClose} onClick={e=>{if(e.target===e.currentTarget)onClose()}}>
   <div className="dialoghead"><h2 id="day-title">{date.getFullYear()}년 {fmt(date)} ({["일","월","화","수","목","금","토"][date.getDay()]})</h2><button type="button" autoFocus aria-label="일정 상세 닫기" onClick={onClose}>×</button></div>
   <p className="dialogcount">{items.length}건의 일정</p>
-  {loading?<div className="none">일정을 불러오는 중입니다…</div>:<Cards items={items}/>}
+  {loading?<div className="none">일정을 불러오는 중입니다…</div>:items.length?<ul className="daylist">{items.map((e,i)=><li key={i} style={{color:color(e.people[0])}}>{short(e.school)}({e.people.join(" · ")||"미지정"})</li>)}</ul>:<div className="none">예정된 3차 점검이 없습니다.</div>}
  </dialog>
 }
