@@ -4,7 +4,7 @@ const COLORS=["#7fa7d8","#87b49b","#a996c8","#d1a477","#78aeb0","#c58f9c","#9ead
 const key=d=>{const x=new Date(d);return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`};
 const add=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
 const color=n=>COLORS[[...(n||"미지정")].reduce((a,ch,i)=>a+ch.charCodeAt(0)*(i+1),0)%COLORS.length];
-const short=s=>s.replace(/여자고등학교$/,"고").replace(/여자중학교$/,"여중").replace(/초등학교$/,"초").replace(/중학교$/,"중").replace(/고등학교$/,"고").replace(/유치원$/,"유");
+const short=s=>s.replace(/여자고등학교$/,"여고").replace(/여자중학교$/,"여중").replace(/초등학교$/,"초").replace(/중학교$/,"중").replace(/고등학교$/,"고").replace(/유치원$/,"유");
 const fmt=d=>`${d.getMonth()+1}월 ${d.getDate()}일`;
 const HOLIDAYS_2026=new Set(["2026-01-01","2026-02-16","2026-02-17","2026-02-18","2026-03-01","2026-03-02","2026-05-05","2026-05-24","2026-05-25","2026-06-03","2026-06-06","2026-08-15","2026-08-17","2026-09-24","2026-09-25","2026-09-26","2026-10-03","2026-10-05","2026-10-09","2026-12-25"]);
 const isRedDay=d=>d.getDay()===0||d.getDay()===6||HOLIDAYS_2026.has(key(d));
